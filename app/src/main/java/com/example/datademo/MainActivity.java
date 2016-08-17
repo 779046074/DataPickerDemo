@@ -1,17 +1,14 @@
 package com.example.datademo;
 
-import android.animation.ValueAnimator;
 import android.graphics.Canvas;
-import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
-import android.graphics.RectF;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
-import android.view.animation.AccelerateDecelerateInterpolator;
 import android.widget.Button;
 import android.widget.Toast;
 
@@ -22,6 +19,7 @@ import java.util.Locale;
 import cn.aigestudio.datepicker.bizs.calendars.DPCManager;
 import cn.aigestudio.datepicker.bizs.decors.DPDecor;
 import cn.aigestudio.datepicker.cons.DPMode;
+import cn.aigestudio.datepicker.utils.MeasureUtil;
 import cn.aigestudio.datepicker.views.DatePicker;
 
 public class MainActivity extends AppCompatActivity {
@@ -49,19 +47,36 @@ public class MainActivity extends AppCompatActivity {
         today = year + "-" + month + "-" + day;
 
         ArrayList<String> needSignInDays = new ArrayList<>();
-        needSignInDays.add("2016-7-28");
-        needSignInDays.add("2016-7-29");
-        needSignInDays.add("2016-7-30");
-        needSignInDays.add("2016-7-31");
+
         needSignInDays.add("2016-8-1");
         needSignInDays.add("2016-8-2");
         needSignInDays.add("2016-8-3");
         needSignInDays.add("2016-8-4");
+        needSignInDays.add("2016-8-5");
+        needSignInDays.add("2016-8-6");
+        needSignInDays.add("2016-8-7");
+        needSignInDays.add("2016-8-8");
+        needSignInDays.add("2016-8-9");
+        needSignInDays.add("2016-8-10");
+        needSignInDays.add("2016-8-11");
+        needSignInDays.add("2016-8-17");
+        needSignInDays.add("2016-8-18");
+        needSignInDays.add("2016-8-19");
         signInBo.setNeedSignInDays(needSignInDays);
 
         ArrayList<String> hasSignedInDays = new ArrayList<>();
-        hasSignedInDays.add("2016-7-28");
-        hasSignedInDays.add("2016-7-29");
+        hasSignedInDays.add("2016-8-1");
+        hasSignedInDays.add("2016-8-2");
+        hasSignedInDays.add("2016-8-3");
+        hasSignedInDays.add("2016-8-4");
+        hasSignedInDays.add("2016-8-5");
+        hasSignedInDays.add("2016-8-6");
+        hasSignedInDays.add("2016-8-7");
+        hasSignedInDays.add("2016-8-8");
+        hasSignedInDays.add("2016-8-9");
+        hasSignedInDays.add("2016-8-17");
+        hasSignedInDays.add("2016-8-18");
+        hasSignedInDays.add("2016-8-19");
         signInBo.setHasSignInDays(hasSignedInDays);
 
         btnSignIn = (Button) findViewById(R.id.btn_signin);
@@ -73,7 +88,6 @@ public class MainActivity extends AppCompatActivity {
                 final DatePicker picker = new DatePicker(MainActivity.this);
                 picker.setDate(year, month);
                 picker.setMode(DPMode.SINGLE);
-                picker.setTodayDisplay(false);
                 picker.setHolidayDisplay(false);
                 picker.setFestivalDisplay(false);
                 picker.setDeferredDisplay(false);
@@ -83,25 +97,18 @@ public class MainActivity extends AppCompatActivity {
                 picker.setDPDecor(new DPDecor() {
                     @Override
                     public void drawDecorBG(Canvas canvas, Rect rect, Paint paint, String data) {
-                        paint.setColor(Color.rgb(216, 209, 207));
+                        paint.setColor(ContextCompat.getColor(MainActivity.this, R.color.bg_gray));
                         paint.setStyle(Paint.Style.FILL);
                         paint.setStrokeWidth(6f);
                         canvas.drawRect(rect, paint);
 
                         for (String hasSignedInDay : signInBo.getHasSignInDays()) {
                             if (data.equals(hasSignedInDay)){
-                                paint.setColor(Color.RED);
+                                paint.setColor(ContextCompat.getColor(MainActivity.this, R.color.bg_cyne));
                                 paint.setStyle(Paint.Style.STROKE);
-                                canvas.drawCircle(rect.centerX(), rect.centerY(), rect.width() / 2f - 5, paint);
+                                canvas.drawCircle(rect.centerX(), rect.centerY(), MeasureUtil.dp2px(MainActivity.this, 16), paint);
 
                             }
-                        }
-
-                        if (data.equals(today)){
-                            paint.setColor(Color.RED);
-                            paint.setStyle(Paint.Style.STROKE);
-                            RectF rectF = new RectF(rect.left+5, rect.top+5, rect.right-5, rect.bottom-5);
-                            canvas.drawArc(rectF, 0, angle, false,paint);
                         }
 
                         //恢复画笔
@@ -130,31 +137,6 @@ public class MainActivity extends AppCompatActivity {
 
                 alertDialog.setContentView(picker);
 
-                //签到动画
-                if (!signInBo.getHasSignInDays().contains(today)){
-
-                    ValueAnimator animator = ValueAnimator.ofFloat(0 ,360);
-                    animator.setDuration(1000);
-                    animator.setInterpolator(new AccelerateDecelerateInterpolator());
-                    animator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-                        @Override
-                        public void onAnimationUpdate(ValueAnimator animation) {
-                            angle = (float) animation.getAnimatedValue();
-                            if (angle >= 360){
-                                handler.post(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        Toast.makeText(MainActivity.this, today + "签到成功", Toast.LENGTH_LONG).show();
-                                        btnSignIn.setText("已签到");
-                                    }
-                                });
-                                signInBo.getHasSignInDays().add(today);
-                            }
-                            picker.postInvalidate();
-                        }
-                    });
-                    animator.start();
-                }
             }
         });
     }
